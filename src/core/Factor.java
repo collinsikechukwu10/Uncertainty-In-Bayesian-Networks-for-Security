@@ -103,6 +103,17 @@ public class Factor {
 
     }
 
+    public void normalize() {
+        // we only normalize a prior distribution, where only one r.v. exists
+        // TODO, [FUTURE WORK] implement for multiple r.v.s
+        if (randomVariables.size() == 1) {
+            double total = cpt.values().stream().reduce(0.0, Double::sum);
+            cpt.forEach((key,probability)->{
+                assignProbability(keyToBoolean(key), probability/total);
+            });
+        }
+    }
+
 
     public void assignProbability(boolean[] values, double prob) {
         if (values.length == getOrderedVariables().size()) {
@@ -118,18 +129,6 @@ public class Factor {
     public Factor join(Factor other) {
         Set<Node> f1Variables = this.getOrderedVariables();
         Set<Node> f2Variables = other.getOrderedVariables();
-
-        // get nodes that are in both f1 and f2
-//        Set<Node> v1 = new HashSet<>(f1Variables);
-//        v1.retainAll(f2Variables);
-
-//        // get nodes only in f1
-//        Set<Node> v2 = new HashSet<>(f1Variables);
-//        v2.removeAll(f2Variables);
-//
-//        // get nodes only in f2
-//        Set<Node> v3 = new HashSet<>(f2Variables);
-//        v2.removeAll(f1Variables);
 
         // all nodes v4= union of variables in both factors
         Set<Node> v4 = new HashSet<>(f1Variables);
@@ -166,10 +165,19 @@ public class Factor {
         return f4;
     }
 
+    public void projectToZero(Node node, boolean value) {
+        for (boolean[] combination : truthTableCombinations()) {
+            Map<String, Boolean> labelValueMap = generateQueryMap(combination);
+            if (labelValueMap.get(node.getLabel()) != value) {
+                assignProbability(combination, 0.0);
+            }
+        }
+    }
+
     public Map<String, Boolean> generateQueryMap(boolean[] values) {
         Map<String, Boolean> labelValueMap = new HashMap<>();
         Node[] orderedNodes = getOrderedVariables().toArray(Node[]::new);
-        // both combinations and ordernodes are the same size
+        // both combinations and order nodes are the same size
         // so get a mapping of node label to value
         for (int i = 0; i < values.length; i++) {
             labelValueMap.put(orderedNodes[i].getLabel(), values[i]);
@@ -210,6 +218,4 @@ public class Factor {
             System.out.println();
         });
     }
-
-
 }

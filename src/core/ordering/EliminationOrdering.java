@@ -1,6 +1,6 @@
 package core.ordering;
 
-public interface OrderingAlgorithm {
+public interface EliminationOrdering {
     public void setOrder(String[] order);
     public String[] getOrder();
 

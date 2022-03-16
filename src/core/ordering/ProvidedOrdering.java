@@ -1,11 +1,11 @@
 package core.ordering;
 
-public class ProvidedOrderingAlgorithm implements OrderingAlgorithm {
+public class ProvidedOrdering implements EliminationOrdering {
 
     private String[] order;
 
 
-    public ProvidedOrderingAlgorithm(){}
+    public ProvidedOrdering(){}
 
     public String[] getOrder() {
         return order;

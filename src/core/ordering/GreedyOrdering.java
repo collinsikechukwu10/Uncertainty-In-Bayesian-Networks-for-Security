@@ -1,6 +1,6 @@
 package core.ordering;
 
-public class OrderingAlgorithm2 implements OrderingAlgorithm{
+public class GreedyOrdering implements EliminationOrdering {
     @Override
     public void setOrder(String[] order) {
 

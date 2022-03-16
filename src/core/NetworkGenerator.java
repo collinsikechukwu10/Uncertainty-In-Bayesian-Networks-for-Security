@@ -46,8 +46,8 @@ public class NetworkGenerator {
         network.addEdge(a, b);
         network.addEdge(b, c);
         network.addEdge(c, d);
-        a.addCPTValues( 0.95,0.05);
-        b.addCPTValues(0.2,0.8,0.95,0.05);
+        a.addCPTValues(0.95, 0.05);
+        b.addCPTValues(0.2, 0.8, 0.95, 0.05);
         c.addCPTValues(0.7, 0.3, 0.9, 0.1);
         d.addCPTValues(0.4, 0.6, 0.6, 0.4);
         return network;
@@ -72,11 +72,11 @@ public class NetworkGenerator {
         network.addEdge(m, n);
         network.addEdge(m, o);
         j.addCPTValues(0.95, 0.05);
-        k.addCPTValues(0.3,0.7,0.1,0.9);
+        k.addCPTValues(0.3, 0.7, 0.1, 0.9);
         l.addCPTValues(0.3, 0.7);
-        m.addCPTValues(0.6, 0.4, 0.7, 0.3, 0.2, 0.8, 0.1, 0.9);
-        n.addCPTValues(0.8,0.2,0.4,0.6);
-        o.addCPTValues(0.05, 0.95, 0.8, 0.2);
+        m.addCPTValues(0.9, 0.1, 0.8, 0.2, 0.3, 0.7, 0.4, 0.6);
+        n.addCPTValues(0.8, 0.2, 0.4, 0.6);
+        o.addCPTValues(0.2, 0.8, 0.95, 0.05);
         return network;
     }
 
@@ -102,13 +102,13 @@ public class NetworkGenerator {
         network.addEdge(v, z);
         network.addEdge(s, z);
         network.addEdge(s, u);
-        p.addCPTValues(0.05, 0.95);
-        q.addCPTValues(0.9, 0.1, 0.7, 0.3);
-        r.addCPTValues(0.7, 0.3);
-        s.addCPTValues(0.6, 0.4, 0.7, 0.3, 0.2, 0.8, 0.1, 0.9);
-        u.addCPTValues(0.05, 0.95, 0.8, 0.2);
-        v.addCPTValues(0.7, 0.3, 0.55, 0.45, 0.15, 0.85, 0.1, 0.9);
-        z.addCPTValues(0.65, 0.35, 0.7, 0.3, 0.4, 0.6, 0.2, 0.8);
+        p.addCPTValues(0.95, 0.05);
+        q.addCPTValues(0.3, 0.7, 0.1, 0.9);
+        r.addCPTValues(0.3, 0.7);
+        s.addCPTValues(0.9, 0.1, 0.8, 0.2, 0.3, 0.7, 0.4, 0.6);
+        u.addCPTValues(0.2, 0.8, 0.95, 0.05);
+        v.addCPTValues(0.9, 0.1, 0.85, 0.15, 0.45, 0.55, 0.3, 0.7);
+        z.addCPTValues(0.8, 0.2, 0.6, 0.4, 0.3, 0.7, 0.35, 0.65);
         return network;
     }
 
