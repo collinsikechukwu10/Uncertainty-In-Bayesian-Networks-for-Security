@@ -14,7 +14,7 @@ import java.util.List;
 public class QueryInfo {
     private final String label;
     private final boolean value;
-    private final List<String[]> evidences = new ArrayList<>();
+    private final List<QueryInfo> evidences = new ArrayList<>();
 
     /**
      * Constructor for query info specifying the random variable label and its value.
@@ -38,7 +38,9 @@ public class QueryInfo {
     public QueryInfo(String label, boolean value, List<String[]> evidences) {
         this.label = label;
         this.value = value;
-        this.evidences.addAll(evidences);
+        for (String[] evidence : evidences) {
+            this.evidences.add(new QueryInfo(evidence[0], resolveBoolean(evidence[1])));
+        }
     }
 
     /**
@@ -74,7 +76,7 @@ public class QueryInfo {
      *
      * @return list of evidence for the query
      */
-    public List<String[]> getEvidences() {
+    public List<QueryInfo> getEvidences() {
         return evidences;
     }
 
@@ -86,4 +88,14 @@ public class QueryInfo {
     public boolean hasEvidence() {
         return getEvidences().size() != 0;
     }
+
+    /**
+     * Returns the boolean representation of a boolen string
+     * @param booleanString boolean string
+     * @return boolean value
+     */
+    public static boolean resolveBoolean(String booleanString) {
+        return booleanString.equalsIgnoreCase("T");
+    }
+
 }

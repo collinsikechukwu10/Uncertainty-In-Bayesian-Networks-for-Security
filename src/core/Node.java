@@ -1,9 +1,6 @@
 package core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Node Class.
@@ -14,8 +11,8 @@ import java.util.Set;
  * @since 15/03/2022
  */
 public class Node {
-    private final Set<Node> parents = new HashSet<>();
-    private final Set<Node> children = new HashSet<>();
+    private final Set<Node> parents = new LinkedHashSet<>();
+    private final Set<Node> children = new LinkedHashSet<>();
     private final String label;
     private Factor cpt;
 
@@ -61,12 +58,8 @@ public class Node {
      * @param vals cpt values
      */
     public void addCPTValues(double... vals) {
-        // get parents
-        Set<Node> nodes = new HashSet<>(getParents());
-        // get current node
-        nodes.add(this);
         // create the factor
-        cpt = new Factor(nodes);
+        cpt = new Factor(this);
         cpt.addValues(vals);
     }
 
@@ -104,5 +97,20 @@ public class Node {
             nodesList.addAll(getAllAncestors(parent));
         }
         return nodesList;
+    }
+
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node node = (Node) o;
+        return label.equals(node.label) && Objects.equals(cpt, node.cpt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(label, cpt);
     }
 }

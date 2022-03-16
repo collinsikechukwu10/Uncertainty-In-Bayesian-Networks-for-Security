@@ -3,6 +3,7 @@ import core.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Scanner;
 
 /**
@@ -38,7 +39,7 @@ public class A3main {
                 String[] order = scannerUtils.getOrder();
                 String variable = query[0];
                 String value = query[1];
-                QueryInfo queryInfo = new QueryInfo(variable, Boolean.parseBoolean(value));
+                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value));
                 QueryResult result = network.query(queryInfo, order);
                 printResult(result.getProbability());
             }
@@ -51,19 +52,19 @@ public class A3main {
                 ArrayList<String[]> evidence = scannerUtils.getEvidence();
                 String variable = query[0];
                 String value = query[1];
-                QueryInfo queryInfo = new QueryInfo(variable, Boolean.parseBoolean(value), evidence);
+                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
                 QueryResult result = network.query(queryInfo, order);
                 printResult(result.getProbability());
             }
             break;
 
             case "P4": {
+                // execute query of p(variable=value|evidence) with given order of elimination
                 String[] query = scannerUtils.getQueriedNode();
                 ArrayList<String[]> evidence = scannerUtils.getEvidence();
                 String variable = query[0];
                 String value = query[1];
-                // execute query of p(variable=value|evidence) with given order of elimination
-                QueryInfo queryInfo = new QueryInfo(variable, Boolean.parseBoolean(value), evidence);
+                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
                 QueryResult result = network.query(queryInfo);
                 System.out.println(Arrays.toString(result.getOrder())); // order = "A,B";
                 printResult(result.getProbability());

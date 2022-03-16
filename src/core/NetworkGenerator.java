@@ -8,6 +8,7 @@ package core;
  * @version 1.0.0
  * @since 15/03/2022
  */
+// TODO reorder cpt values as the table starts with false and true, and what we are adding starts from true to false
 public class NetworkGenerator {
 
     /**
@@ -45,9 +46,9 @@ public class NetworkGenerator {
         network.addEdge(a, b);
         network.addEdge(b, c);
         network.addEdge(c, d);
-        a.addCPTValues(0.05, 0.95);
-        b.addCPTValues(0.05, 0.95, 0.8, 0.2);
-        c.addCPTValues(0.1, 0.9, 0.3, 0.7);
+        a.addCPTValues( 0.95,0.05);
+        b.addCPTValues(0.2,0.8,0.95,0.05);
+        c.addCPTValues(0.7, 0.3, 0.9, 0.1);
         d.addCPTValues(0.4, 0.6, 0.6, 0.4);
         return network;
     }
@@ -70,11 +71,11 @@ public class NetworkGenerator {
         network.addEdge(l, m);
         network.addEdge(m, n);
         network.addEdge(m, o);
-        j.addCPTValues(0.05, 0.95);
-        k.addCPTValues(0.9, 0.1, 0.7, 0.3);
-        l.addCPTValues(0.7, 0.3);
+        j.addCPTValues(0.95, 0.05);
+        k.addCPTValues(0.3,0.7,0.1,0.9);
+        l.addCPTValues(0.3, 0.7);
         m.addCPTValues(0.6, 0.4, 0.7, 0.3, 0.2, 0.8, 0.1, 0.9);
-        n.addCPTValues(0.6, 0.4, 0.2, 0.8);
+        n.addCPTValues(0.8,0.2,0.4,0.6);
         o.addCPTValues(0.05, 0.95, 0.8, 0.2);
         return network;
     }
