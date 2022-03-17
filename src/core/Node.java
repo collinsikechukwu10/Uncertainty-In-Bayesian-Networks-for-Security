@@ -80,6 +80,14 @@ public class Node {
     public Set<Node> getParents() {
         return parents;
     }
+    /**
+     * Gets the children of the node
+     *
+     * @return node children
+     */
+    public Set<Node> getChildren() {
+        return children;
+    }
 
     /**
      * Gets all ancestors of a node

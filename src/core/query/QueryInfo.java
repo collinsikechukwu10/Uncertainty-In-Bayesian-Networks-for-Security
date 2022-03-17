@@ -1,4 +1,6 @@
-package core;
+package core.query;
+
+import core.BayesianNetwork;
 
 import java.util.ArrayList;
 import java.util.List;

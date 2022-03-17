@@ -1,9 +1,13 @@
 import core.*;
+import core.ordering.GreedyOrderingStrategy;
+import core.ordering.MaxCardinalitySearchOrderingStrategy;
+import core.ordering.ProvidedOrderingStrategy;
+import core.query.QueryInfo;
+import core.query.QueryResult;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Scanner;
 
 /**
@@ -40,7 +44,8 @@ public class A3main {
                 String variable = query[0];
                 String value = query[1];
                 QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value));
-                QueryResult result = network.query(queryInfo, order);
+                network.setOrdering(new ProvidedOrderingStrategy(order));
+                QueryResult result = network.query(queryInfo);
                 printResult(result.getProbability());
             }
             break;
@@ -53,25 +58,36 @@ public class A3main {
                 String variable = query[0];
                 String value = query[1];
                 QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
-                QueryResult result = network.query(queryInfo, order);
+                network.setOrdering(new ProvidedOrderingStrategy(order));
+                QueryResult result = network.query(queryInfo);
                 printResult(result.getProbability());
             }
             break;
 
             case "P4": {
-                // execute query of p(variable=value|evidence) with given order of elimination
+                // execute query of p(variable=value|evidence) using max cardinality search ordering
                 String[] query = scannerUtils.getQueriedNode();
                 ArrayList<String[]> evidence = scannerUtils.getEvidence();
                 String variable = query[0];
                 String value = query[1];
                 QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
+                network.setOrdering(new MaxCardinalitySearchOrderingStrategy());
                 QueryResult result = network.query(queryInfo);
                 System.out.println(Arrays.toString(result.getOrder())); // order = "A,B";
                 printResult(result.getProbability());
             }
             break;
             case "P5": {
-
+                // execute query of p(variable=value|evidence) using greedy search ordering
+                String[] query = scannerUtils.getQueriedNode();
+                ArrayList<String[]> evidence = scannerUtils.getEvidence();
+                String variable = query[0];
+                String value = query[1];
+                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
+                network.setOrdering(new GreedyOrderingStrategy());
+                QueryResult result = network.query(queryInfo);
+                System.out.println(Arrays.toString(result.getOrder()));
+                printResult(result.getProbability());
             }
             break;
         }
