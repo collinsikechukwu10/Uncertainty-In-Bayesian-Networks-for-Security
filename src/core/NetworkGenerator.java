@@ -8,7 +8,6 @@ package core;
  * @version 1.0.0
  * @since 15/03/2022
  */
-// TODO reorder cpt values as the table starts with false and true, and what we are adding starts from true to false
 public class NetworkGenerator {
 
     /**

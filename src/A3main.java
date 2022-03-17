@@ -23,6 +23,11 @@ import java.util.Scanner;
 public class A3main {
     private static final DecimalFormat dd = new DecimalFormat("#0.00000");
 
+    /**
+     * Main command line entrypoint.
+     *
+     * @param args command line string arguments
+     */
     public static void main(String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -41,9 +46,7 @@ public class A3main {
                 // execute query of p(variable=value) with given order of elimination
                 String[] query = scannerUtils.getQueriedNode();
                 String[] order = scannerUtils.getOrder();
-                String variable = query[0];
-                String value = query[1];
-                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value));
+                QueryInfo queryInfo = new QueryInfo(query[0], QueryInfo.resolveBoolean(query[1]));
                 network.setOrdering(new ProvidedOrderingStrategy(order));
                 QueryResult result = network.query(queryInfo);
                 printResult(result.getProbability());
@@ -55,9 +58,7 @@ public class A3main {
                 String[] query = scannerUtils.getQueriedNode();
                 String[] order = scannerUtils.getOrder();
                 ArrayList<String[]> evidence = scannerUtils.getEvidence();
-                String variable = query[0];
-                String value = query[1];
-                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
+                QueryInfo queryInfo = new QueryInfo(query[0], QueryInfo.resolveBoolean(query[1]), evidence);
                 network.setOrdering(new ProvidedOrderingStrategy(order));
                 QueryResult result = network.query(queryInfo);
                 printResult(result.getProbability());
@@ -68,9 +69,8 @@ public class A3main {
                 // execute query of p(variable=value|evidence) using max cardinality search ordering
                 String[] query = scannerUtils.getQueriedNode();
                 ArrayList<String[]> evidence = scannerUtils.getEvidence();
-                String variable = query[0];
-                String value = query[1];
-                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
+                QueryInfo queryInfo = new QueryInfo(query[0], QueryInfo.resolveBoolean(query[1]), evidence);
+                // using automatic ordering algorithm
                 network.setOrdering(new MaxCardinalitySearchOrderingStrategy());
                 QueryResult result = network.query(queryInfo);
                 System.out.println(Arrays.toString(result.getOrder())); // order = "A,B";
@@ -81,9 +81,7 @@ public class A3main {
                 // execute query of p(variable=value|evidence) using greedy search ordering
                 String[] query = scannerUtils.getQueriedNode();
                 ArrayList<String[]> evidence = scannerUtils.getEvidence();
-                String variable = query[0];
-                String value = query[1];
-                QueryInfo queryInfo = new QueryInfo(variable, QueryInfo.resolveBoolean(value), evidence);
+                QueryInfo queryInfo = new QueryInfo(query[0], QueryInfo.resolveBoolean(query[1]), evidence);
                 network.setOrdering(new GreedyOrderingStrategy());
                 QueryResult result = network.query(queryInfo);
                 System.out.println(Arrays.toString(result.getOrder()));
@@ -94,7 +92,10 @@ public class A3main {
         sc.close();
     }
 
-    //method to format and print the result
+    /**
+     * Method to format and print the result.
+     * @param result numeric result
+     */
     private static void printResult(double result) {
         System.out.println(dd.format(result));
     }

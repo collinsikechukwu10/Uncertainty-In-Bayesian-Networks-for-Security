@@ -8,6 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Intermediate Ordering Class.
+ * This class is the base class for all automatic order generation for bayesian network queries.
+ *
+ * @author 210032207
+ * @version 1.0.0
+ * @since 15/03/2022
+ */
 public abstract class IntermediateOrderingStrategy extends BasicOrderingStrategy {
 
     private InducedGraph inducedGraph;
@@ -25,18 +33,38 @@ public abstract class IntermediateOrderingStrategy extends BasicOrderingStrategy
         return count;
     }
 
+    /**
+     * Gets the induced graph
+     *
+     * @return induced graph
+     */
     public InducedGraph getInducedGraph() {
         return inducedGraph;
     }
 
+    /**
+     * Sets the induced graph
+     *
+     * @param inducedGraph induced graph
+     */
     public void setInducedGraph(InducedGraph inducedGraph) {
         this.inducedGraph = inducedGraph;
     }
 
+    /**
+     * Gets nodes used to generate the induced graph.
+     *
+     * @return list of nodes
+     */
     public List<Node> getNodesList() {
         return nodesList;
     }
 
+    /**
+     * Sets the list of nodes used to generate an induced graph.
+     *
+     * @param nodesList list of nodes
+     */
     public void setNodesList(List<Node> nodesList) {
         this.nodesList = nodesList;
         this.inducedGraph = new InducedGraph(new HashSet<>(nodesList));

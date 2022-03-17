@@ -4,6 +4,14 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Induced Graph Node class.
+ * This class generates an induced graph node which is a label and a list of neighbours.
+ *
+ * @author 210032207
+ * @version 1.0.0
+ * @since 15/03/2022
+ */
 public class InducedGraphNode {
     private final Set<InducedGraphNode> neighbours = new LinkedHashSet<>();
     private final String label;

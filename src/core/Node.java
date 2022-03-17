@@ -80,6 +80,7 @@ public class Node {
     public Set<Node> getParents() {
         return parents;
     }
+
     /**
      * Gets the children of the node
      *
@@ -106,8 +107,6 @@ public class Node {
         }
         return nodesList;
     }
-
-
 
     @Override
     public boolean equals(Object o) {

@@ -5,7 +5,14 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.ArrayList;
 
-
+/**
+ * Induced Graph class.
+ * This class generates an induced graph of node labels and their neighbours without regarding directions of connectivity.
+ *
+ * @author 210032207
+ * @version 1.0.0
+ * @since 15/03/2022
+ */
 public class InducedGraph {
     private final Set<InducedGraphNode> inducedGraphNodes = new LinkedHashSet<>();
 

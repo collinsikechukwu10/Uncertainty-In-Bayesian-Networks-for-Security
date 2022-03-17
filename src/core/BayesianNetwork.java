@@ -21,6 +21,9 @@ public class BayesianNetwork {
     private final Set<Node> nodes = new LinkedHashSet<>();
     private BasicOrderingStrategy ordering;
 
+    public BayesianNetwork() {
+    }
+
     /**
      * Adds a node to the bayesian network
      *
@@ -41,11 +44,17 @@ public class BayesianNetwork {
     public void setOrdering(BasicOrderingStrategy ordering) {
         this.ordering = ordering;
 
-        if(ordering instanceof IntermediateOrderingStrategy){
+        if (ordering instanceof IntermediateOrderingStrategy) {
             ((IntermediateOrderingStrategy) ordering).setNodesList(new ArrayList<>(this.nodes));
         }
     }
 
+    /**
+     * Gets a node using a label
+     *
+     * @param label node label
+     * @return node
+     */
     public Node getNode(String label) {
         return nodes.stream().filter(x -> x.getLabel().equalsIgnoreCase(label)).findFirst().orElse(null);
     }
@@ -64,6 +73,16 @@ public class BayesianNetwork {
     }
 
     /**
+     * Gets a copy of the factor of a set of nodes.
+     *
+     * @param nodeLabels set of node labels.
+     * @return list of factors for each label
+     */
+    private List<Factor> getFactors(Set<String> nodeLabels) {
+        return nodeLabels.stream().map(x -> getNode(x).getCpt().copy()).collect(Collectors.toList());
+    }
+
+    /**
      * Query a variable using an order. THis is done using variable elimination
      *
      * @param queryInfo query info object containing the query variable, its value and a list of evidence
@@ -71,116 +90,69 @@ public class BayesianNetwork {
      */
     public QueryResult query(QueryInfo queryInfo) {
         if (queryInfo.exists(this)) {
+            // prune order first
+            // do target first
+            Node queryNode = getNode(queryInfo.getLabel());
+            Set<String> order = ordering.getOrder(queryInfo);
+            Set<String> prunedOrder = pruneOrder(order, queryInfo);
+
+            // add evidence to prunable order because previous function does not include it
+            Set<String> factorLabels = new HashSet<>(prunedOrder);
+            factorLabels.add(queryNode.getLabel());
+
+            // get factors for the pruned list, evidences and query node
+            List<Factor> factors = getFactors(factorLabels);
             if (queryInfo.hasEvidence()) {
-                return queryWithEvidence(queryInfo);
-            } else {
-                return queryWithoutEvidence(queryInfo);
-            }
-        }
-        return null;
-    }
-
-    private QueryResult queryWithoutEvidence(QueryInfo queryInfo) {
-        //P2
-        // get query node
-        Node queryNode = getNode(queryInfo.getLabel());
-        // prune order first
-        Set<String> order = ordering.getOrder(queryInfo);
-        Set<String> prunedOrder = pruneOrder(order, queryInfo);
-        Set<String> factorLabels = new HashSet<>(prunedOrder);
-        factorLabels.add(queryNode.getLabel());
-        // get factors for the pruned list
-        List<Factor> factors = getFactors(factorLabels);
-
-        for (String pruneLabel : prunedOrder) {
-
-            // find all the factors that contains the label
-            List<Factor> toSumOut = factors.stream().filter(x -> x.includes(getNode(pruneLabel))).collect(Collectors.toList());
-
-            // perform join marginalize algorithm
-            Factor f = toSumOut.get(0);
-            for (int i = 1; i < toSumOut.size(); i++) {
-                Factor tmp = f.join(toSumOut.get(i));
-                f = tmp.sumOut(getNode(pruneLabel));
-            }
-            factors.removeAll(toSumOut);
-            factors.add(f);
-        }
-        // only one should remain, if not, then you are doing something wrong
-        Factor queryFactor = factors.get(0);
-        // get probability based on the queried random variable and its value
-        Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
-        double probability = queryFactor.get(queryMap);
-
-        return new QueryResult(probability, prunedOrder.toArray(String[]::new));
-    }
-
-
-    private List<Factor> getFactors(Set<String> nodeLabels) {
-        return nodeLabels.stream().map(x -> getNode(x).getCpt().copy()).collect(Collectors.toList());
-    }
-
-
-    private QueryResult queryWithEvidence(QueryInfo queryInfo) {
-        // prune order first
-        // do target first
-        Node queryNode = getNode(queryInfo.getLabel());
-        Set<String> order = ordering.getOrder(queryInfo);
-        Set<String> prunedOrder = pruneOrder(order, queryInfo);
-
-        // add evidence to prunable order because previous function does not include it
-        Set<String> factorLabels = new HashSet<>(prunedOrder);
-        factorLabels.add(queryNode.getLabel());
-
-        // get factors for the pruned list, evidences and query node
-        List<Factor> factors = getFactors(factorLabels);
-
-        // set evidence in factor to zero for each factor that the r.v. exists in where its value is the same as the evidence value
-        for (QueryInfo evidence : queryInfo.getEvidences()) {
-            factors.forEach(factor -> {
-                Node evidenceNode = getNode(evidence.getLabel());
-                if (factor.includes(evidenceNode)) {
-                    factor.projectToZero(evidenceNode, evidence.getQueryValue());
+                // set evidence in factor to zero for each factor that the r.v. exists in where its value is the same as the evidence value
+                for (QueryInfo evidence : queryInfo.getEvidences()) {
+                    factors.forEach(factor -> {
+                        Node evidenceNode = getNode(evidence.getLabel());
+                        if (factor.includes(evidenceNode)) {
+                            // project the negation of the query value to 0
+                            factor.projectToZero(evidenceNode, !evidence.getQueryValue());
+                        }
+                    });
                 }
-            });
-        }
-        // prune label
-        for (String pruneLabel : prunedOrder) {
+            }
 
-            // find all the factors that contains the label
-            List<Factor> toSumOut = factors.stream().filter(x -> x.includes(getNode(pruneLabel))).collect(Collectors.toList());
+            // prune labels
+            for (String pruneLabel : prunedOrder) {
 
-            // perform join marginalize algorithm
-            Factor f = toSumOut.get(0);
-            if (toSumOut.size() > 1) {
-                for (int i = 1; i < toSumOut.size(); i++) {
-                    Factor tmp = f.join(toSumOut.get(i));
-                    f = tmp.sumOut(getNode(pruneLabel));
+                // find all the factors that contains the label
+                List<Factor> toSumOut = factors.stream().filter(x -> x.includes(getNode(pruneLabel))).collect(Collectors.toList());
+
+                // perform join marginalize algorithm
+                Factor f = toSumOut.get(0);
+                if (toSumOut.size() > 1) {
+                    for (int i = 1; i < toSumOut.size(); i++) {
+                        Factor tmp = f.join(toSumOut.get(i));
+                        f = tmp.sumOut(getNode(pruneLabel));
+                    }
+                } else {
+                    f = f.sumOut(getNode(pruneLabel));
                 }
-            } else {
-                f = f.sumOut(getNode(pruneLabel));
+                factors.removeAll(toSumOut);
+                factors.add(f);
             }
 
-            factors.removeAll(toSumOut);
-            factors.add(f);
-        }
-
-        // join factors if factors are more than one
-        if (factors.size() > 1) {
-            Factor f = factors.get(0);
-            for (int i = 1; i < factors.size(); i++) {
-                f = f.join(factors.get(i));
+            // join factors if factors are more than one
+            if (factors.size() > 1) {
+                Factor f = factors.get(0);
+                for (int i = 1; i < factors.size(); i++) {
+                    f = f.join(factors.get(i));
+                }
+                factors = new ArrayList<>(List.of(f));
             }
-            factors = new ArrayList<>(List.of(f));
-        }
-        Factor queryFactor = factors.get(0);
-        // normalize
-        queryFactor.normalize();
-        // get probability based on the queried random variable and its value
-        Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
-        double probability = queryFactor.get(queryMap);
+            Factor queryFactor = factors.get(0);
+            // normalize
+            queryFactor.normalize();
+            // get probability based on the queried random variable and its value
+            Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
+            double probability = queryFactor.get(queryMap);
 
-        return new QueryResult(probability, prunedOrder.toArray(String[]::new));
+            return new QueryResult(probability, order.toArray(String[]::new));
+        }
+        return new QueryResult(0.0,new String[0]);
     }
 
 

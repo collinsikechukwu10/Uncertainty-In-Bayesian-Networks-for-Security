@@ -1,20 +1,32 @@
 package core.ordering;
 
-import core.BayesianNetwork;
 import core.InducedGraph;
-import core.NetworkGenerator;
 import core.Node;
 import core.query.QueryInfo;
-import core.query.QueryResult;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Maximum Cardinality Search Ordering Class.
+ * This class is used to automatically generate an order for a bayesian network query using the maximum cardinality search algorithm.
+ *
+ * @author 210032207
+ * @version 1.0.0
+ * @since 15/03/2022
+ */
 public class MaxCardinalitySearchOrderingStrategy extends IntermediateOrderingStrategy {
-
+    /**
+     * Gets the label with the highest number of marked neighbours.
+     *
+     * @param graph      induced graph with connected labels
+     * @param markedList marked labels
+     * @param labels     searchable labels
+     * @return label with max number of marked neighbours
+     */
     private String getLabelWithMaxNumberOfMarkedNeighbours(InducedGraph graph, Set<String> markedList, Set<String> labels) {
         String y = null;
-        int maxNoOfNeighbours = -1;
+        int maxNoOfNeighbours = Integer.MIN_VALUE;
         for (String label : labels) {
             int unmarkedLabelMarkedNeighboursSize = getNumberOfMarkedNeighbours(graph, markedList, label);
             if (unmarkedLabelMarkedNeighboursSize > maxNoOfNeighbours) {
@@ -25,6 +37,12 @@ public class MaxCardinalitySearchOrderingStrategy extends IntermediateOrderingSt
         return y;
     }
 
+    /**
+     * Gets the order based on the ordering algorithm.
+     *
+     * @param queryInfo query information
+     * @return set of labels
+     */
     @Override
     public Set<String> getOrder(QueryInfo queryInfo) {
         Node queryNode = getNodesList().stream().filter(n -> n.getLabel().equalsIgnoreCase(queryInfo.getLabel())).findFirst().orElse(null);
@@ -46,11 +64,4 @@ public class MaxCardinalitySearchOrderingStrategy extends IntermediateOrderingSt
         }
         return Set.of();
     }
-
-//    public static void main(String[] args) {
-//        BayesianNetwork n = NetworkGenerator.buildNetwork("BNB");
-//        n.setOrdering(new MaxCardinalitySearchOrderingStrategy());
-//        QueryResult f = n.query(new QueryInfo("N",true));
-//        System.out.println(Arrays.toString(f.getOrder()));
-//    }
 }

@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 /**
  * Factor Class.
- * This class denotes a probability distribution table.
+ * This class stores the probability distribution table of a set of nodes.
  *
  * @author 210032207
  * @version 1.0.0
@@ -17,35 +17,66 @@ public class Factor {
     private final Map<String, Double> cpt = new TreeMap<>();
     private final Set<Node> randomVariables = new LinkedHashSet<>();
 
+    /**
+     * Constructor specifying the node.
+     *
+     * @param node node
+     */
     public Factor(Node node) {
         randomVariables.addAll(node.getParents());
         randomVariables.add(node);
     }
 
-    public Map<String, Double> getCpt() {
-        return cpt;
-    }
-
+    /**
+     * Constructor specifying the list of random variables to use in the probability table.
+     *
+     * @param randomVariables set of random variable nodes to use in the factor
+     */
     public Factor(Set<Node> randomVariables) {
         this.randomVariables.addAll(randomVariables);
     }
 
+    /**
+     * Gets the probability table.
+     *
+     * @return probability table
+     */
+    public Map<String, Double> getCpt() {
+        return cpt;
+    }
+
+    /**
+     * Gets the random variables used in the probability table.
+     *
+     * @return random variable nodes
+     */
     public Set<Node> getOrderedVariables() {
         return randomVariables;
     }
 
-    public void addValues(double... vals) {
+    /**
+     * Fills the probability table with probability values.
+     *
+     * @param values probabilities
+     */
+    public void addValues(double... values) {
         int noOfVariables = getOrderedVariables().size();
         int tableSize = (int) Math.pow(2, noOfVariables);
         // assert that table size is equal to the number of values provided
-        if (vals.length == tableSize) {
+        if (values.length == tableSize) {
             for (int i = 0; i < tableSize; i++) {
                 String key = expandBinary(Integer.toBinaryString(i), noOfVariables);
-                cpt.put(key, vals[i]);
+                cpt.put(key, values[i]);
             }
         }
     }
 
+    /**
+     * Generates a list of truth table combinations for the set of random variables
+     * used to generate the probability table.
+     *
+     * @return truth table combinations
+     */
     public List<boolean[]> truthTableCombinations() {
         int noOfVariables = getOrderedVariables().size();
         int tableSize = (int) Math.pow(2, noOfVariables);
@@ -62,6 +93,13 @@ public class Factor {
         return combinations;
     }
 
+    /**
+     * Expand a binary string to a certain length.
+     *
+     * @param binaryString binary string to expand
+     * @param size         required size of the string
+     * @return expanded binary string
+     */
     private String expandBinary(String binaryString, int size) {
         if (size > binaryString.length()) {
             return "0".repeat(size - binaryString.length()) + binaryString;
@@ -69,6 +107,12 @@ public class Factor {
         return binaryString;
     }
 
+    /**
+     * Gets the probability table key representation of the list of values for the set of random variables used.
+     *
+     * @param nodeValues values for the random variables used
+     * @return probability table key
+     */
     public String getKey(boolean[] nodeValues) {
         String key = "";
         if (nodeValues.length == getOrderedVariables().size()) {
@@ -79,6 +123,12 @@ public class Factor {
         return key;
     }
 
+    /**
+     * Represents a probability table key as an array of values for the set of random variables used.
+     *
+     * @param key probability table key
+     * @return array of values for the set of random variables used
+     */
     public boolean[] keyToBoolean(String key) {
         boolean[] booleanKey = new boolean[key.length()];
         char[] keyArray = key.toCharArray();
@@ -88,6 +138,12 @@ public class Factor {
         return booleanKey;
     }
 
+    /**
+     * Gets the occurrence probability of a set of values of the random variable used.
+     *
+     * @param nodeLabelValueMap map of random variable labels and their values
+     * @return probability of the set of provided values of the random variables occurring
+     */
     public double get(Map<String, Boolean> nodeLabelValueMap) {
         String key = "";
         for (Node orderedVariable : getOrderedVariables()) {
@@ -96,6 +152,11 @@ public class Factor {
         return cpt.get(key);
     }
 
+    /**
+     * Generates a copy of a factor.
+     *
+     * @return coopy of a factor
+     */
     public Factor copy() {
         Factor factor = new Factor(getOrderedVariables());
         getCpt().forEach((key, prob) -> factor.assignProbability(keyToBoolean(key), prob));
@@ -108,24 +169,38 @@ public class Factor {
         // TODO, [FUTURE WORK] implement for multiple r.v.s
         if (randomVariables.size() == 1) {
             double total = cpt.values().stream().reduce(0.0, Double::sum);
-            cpt.forEach((key,probability)->{
-                assignProbability(keyToBoolean(key), probability/total);
-            });
+            cpt.forEach((key, probability) -> assignProbability(keyToBoolean(key), probability / total));
         }
     }
 
-
+    /**
+     * Sets a probability for an event occurring.
+     *
+     * @param values array of values for the random variables used
+     * @param prob   probability of the event occurring
+     */
     public void assignProbability(boolean[] values, double prob) {
         if (values.length == getOrderedVariables().size()) {
             cpt.put(getKey(values), prob);
         }
     }
 
-
+    /**
+     * Checks of a random variable node is included in the factor
+     *
+     * @param otherNode random variable node
+     * @return True if node exists in the factor
+     */
     public boolean includes(Node otherNode) {
         return getOrderedVariables().contains(otherNode);
     }
 
+    /**
+     * Joins another factor using point wise product
+     *
+     * @param other other factor
+     * @return joined factor
+     */
     public Factor join(Factor other) {
         Set<Node> f1Variables = this.getOrderedVariables();
         Set<Node> f2Variables = other.getOrderedVariables();
@@ -144,6 +219,12 @@ public class Factor {
         return f3;
     }
 
+    /**
+     * Removes a random variable from a factor by marginalization.
+     *
+     * @param randomVariableToRemove random variable node
+     * @return factor excluding the random variable
+     */
     public Factor sumOut(Node randomVariableToRemove) {
         // make a new factor that doesnt include the label you want to remove
         Set<Node> newVariables = new HashSet<>(this.getOrderedVariables());
@@ -165,15 +246,27 @@ public class Factor {
         return f4;
     }
 
+    /**
+     * Projects the probability of an event for a random variable to 0
+     *
+     * @param node  random variable node
+     * @param value random variable value
+     */
     public void projectToZero(Node node, boolean value) {
         for (boolean[] combination : truthTableCombinations()) {
             Map<String, Boolean> labelValueMap = generateQueryMap(combination);
-            if (labelValueMap.get(node.getLabel()) != value) {
+            if (labelValueMap.get(node.getLabel()) == value) {
                 assignProbability(combination, 0.0);
             }
         }
     }
 
+    /**
+     * Generate a mapping of random variables label to their value.
+     *
+     * @param values values for the random variables used
+     * @return random variables and value mapping
+     */
     public Map<String, Boolean> generateQueryMap(boolean[] values) {
         Map<String, Boolean> labelValueMap = new HashMap<>();
         Node[] orderedNodes = getOrderedVariables().toArray(Node[]::new);
@@ -185,6 +278,11 @@ public class Factor {
         return labelValueMap;
     }
 
+    /**
+     * Generates the label for the factor
+     *
+     * @return factor label
+     */
     private String getFactorLabel() {
         // separate node from its parents
         String label;
@@ -202,6 +300,9 @@ public class Factor {
 
     }
 
+    /**
+     * Prints the probability table.
+     */
     public void logCPTValues() {
         // get table header
         randomVariables.forEach(x -> System.out.print(x.getLabel() + " "));
