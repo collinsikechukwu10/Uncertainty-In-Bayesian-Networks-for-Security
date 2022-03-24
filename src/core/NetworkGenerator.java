@@ -18,15 +18,25 @@ public class NetworkGenerator {
     private static BayesianNetwork createCNXNetwork() {
         BayesianNetwork network = new BayesianNetwork();
         Node maintenance = network.addNode("Maintenance");
+        Node maintenanceInfo = network.addNode("Maintenance Info");
         Node firewall = network.addNode("Firewall");
         Node maliciousWebsite = network.addNode("Malicious Website");
         Node holiday = network.addNode("Holiday");
         Node attack = network.addNode("Attack");
         Node logging = network.addNode("Logging ");
-        Node alarm = network.addNode("Alarm");
+        Node alarmTrigger = network.addNode("Alarm Trigger");
         holiday.addCPTValues(0.125, 0.875);
-        network.addEdge(holiday, attack);
+        network.addEdge(maintenanceInfo, maintenance);
         network.addEdge(maintenance, firewall);
+        network.addEdge(maintenanceInfo, firewall);
+
+        network.addEdge(holiday, attack);
+        network.addEdge(firewall, attack);
+        network.addEdge(maliciousWebsite, attack);
+
+        network.addEdge(attack, alarmTrigger);
+        network.addEdge(attack, logging);
+        network.addEdge(alarmTrigger, logging);
 
         return network;
     }
