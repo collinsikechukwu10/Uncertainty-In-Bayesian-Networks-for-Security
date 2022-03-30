@@ -11,6 +11,7 @@ package core.query;
 public class QueryResult {
     private final double probability;
     private final String[] order;
+    private final int noOfJoins;
 
     /**
      * Constructor specifying the probability and the query order
@@ -19,8 +20,21 @@ public class QueryResult {
      * @param order       query order
      */
     public QueryResult(double probability, String[] order) {
+        this(probability, order, -1);
+
+    }
+
+    /**
+     * Constructor specifying the probability and the query order and number of joins.
+     *
+     * @param probability query r.v probability
+     * @param order       query order
+     * @param noOfJoins   number of joins
+     */
+    public QueryResult(double probability, String[] order, int noOfJoins) {
         this.probability = probability;
         this.order = order;
+        this.noOfJoins = noOfJoins;
 
     }
 
@@ -40,5 +54,14 @@ public class QueryResult {
      */
     public String[] getOrder() {
         return order;
+    }
+
+    /**
+     * Gets the number of joins
+     *
+     * @return number of joins
+     */
+    public int getNoOfJoins() {
+        return noOfJoins;
     }
 }

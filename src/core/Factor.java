@@ -206,7 +206,7 @@ public class Factor {
         Set<Node> f2Variables = other.getOrderedVariables();
 
         // all nodes v4= union of variables in both factors
-        Set<Node> v4 = new HashSet<>(f1Variables);
+        Set<Node> v4 = new LinkedHashSet<>(f1Variables);
         v4.addAll(f2Variables);
         Factor f3 = new Factor(v4);
         // generate f3 values for every combination of the
@@ -227,7 +227,7 @@ public class Factor {
      */
     public Factor sumOut(Node randomVariableToRemove) {
         // make a new factor that doesnt include the label you want to remove
-        Set<Node> newVariables = new HashSet<>(this.getOrderedVariables());
+        Set<Node> newVariables = new LinkedHashSet<>(this.getOrderedVariables());
         newVariables.remove(randomVariableToRemove);
         Factor f4 = new Factor(newVariables);
         // sum where random variable == true and when == false
@@ -283,7 +283,7 @@ public class Factor {
      *
      * @return factor label
      */
-    private String getFactorLabel() {
+    public String getFactorLabel() {
         // separate node from its parents
         String label;
         Node[] randomVariablesArray = randomVariables.toArray(Node[]::new);
@@ -312,7 +312,7 @@ public class Factor {
         // get table values
         cpt.forEach((key, probability) -> {
             for (char c : key.toCharArray()) {
-                System.out.print(c + " ");
+                System.out.print((c == '1') ? "T " : "F ");
             }
             System.out.print("| ");
             System.out.print(probability);

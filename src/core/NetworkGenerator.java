@@ -22,10 +22,9 @@ public class NetworkGenerator {
         Node firewall = network.addNode("Firewall");
         Node maliciousWebsite = network.addNode("Malicious Website");
         Node holiday = network.addNode("Holiday");
-        Node attack = network.addNode("Attack");
-        Node logging = network.addNode("Logging ");
+        Node attack = network.addNode("Security Attack");
+        Node logging = network.addNode("Logging");
         Node alarmTrigger = network.addNode("Alarm Trigger");
-        holiday.addCPTValues(0.125, 0.875);
         network.addEdge(maintenanceInfo, maintenance);
         network.addEdge(maintenance, firewall);
         network.addEdge(maintenanceInfo, firewall);
@@ -38,6 +37,7 @@ public class NetworkGenerator {
         network.addEdge(attack, logging);
         network.addEdge(alarmTrigger, logging);
 
+        holiday.addCPTValues(0.125, 0.875);
         return network;
     }
 
@@ -108,8 +108,8 @@ public class NetworkGenerator {
         network.addEdge(q, s);
         network.addEdge(r, v);
         network.addEdge(r, s);
-        network.addEdge(v, z);
         network.addEdge(s, z);
+        network.addEdge(v, z);
         network.addEdge(s, u);
         p.addCPTValues(0.95, 0.05);
         q.addCPTValues(0.3, 0.7, 0.1, 0.9);
@@ -117,7 +117,7 @@ public class NetworkGenerator {
         s.addCPTValues(0.9, 0.1, 0.8, 0.2, 0.3, 0.7, 0.4, 0.6);
         u.addCPTValues(0.2, 0.8, 0.95, 0.05);
         v.addCPTValues(0.9, 0.1, 0.85, 0.15, 0.45, 0.55, 0.3, 0.7);
-        z.addCPTValues(0.8, 0.2, 0.6, 0.4, 0.3, 0.7, 0.35, 0.65);
+        z.addCPTValues(0.8, 0.2, 0.3, 0.7, 0.6, 0.4, 0.35, 0.65);
         return network;
     }
 

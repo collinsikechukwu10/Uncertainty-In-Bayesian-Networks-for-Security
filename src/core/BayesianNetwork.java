@@ -20,8 +20,21 @@ public class BayesianNetwork {
     // maintain insertion order
     private final Set<Node> nodes = new LinkedHashSet<>();
     private BasicOrderingStrategy ordering;
+    private boolean verbose;
+
+    /**
+     * Bayesian network empty constructor.
+     */
+    public BayesianNetwork(boolean verbose) {
+        this.verbose = verbose;
+    }
 
     public BayesianNetwork() {
+        this(false);
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 
     /**
@@ -94,14 +107,18 @@ public class BayesianNetwork {
             // do target first
             Node queryNode = getNode(queryInfo.getLabel());
             Set<String> order = ordering.getOrder(queryInfo);
-            Set<String> prunedOrder = pruneOrder(order, queryInfo);
+
+            Set<String> prunedOrder = new LinkedHashSet<>(order);
+            Set<String> labelsToKeep = labelsToKeep(order, queryInfo);
+            prunedOrder.retainAll(labelsToKeep);
+            // lets track the number of joins
+            int noOfJoins = 0;
 
             // add evidence to prunable order because previous function does not include it
-            Set<String> factorLabels = new HashSet<>(prunedOrder);
-            factorLabels.add(queryNode.getLabel());
+            labelsToKeep.add(queryNode.getLabel());
 
             // get factors for the pruned list, evidences and query node
-            List<Factor> factors = getFactors(factorLabels);
+            List<Factor> factors = getFactors(labelsToKeep);
             if (queryInfo.hasEvidence()) {
                 // set evidence in factor to zero for each factor that the r.v. exists in where its value is the same as the evidence value
                 for (QueryInfo evidence : queryInfo.getEvidences()) {
@@ -114,8 +131,6 @@ public class BayesianNetwork {
                     });
                 }
             }
-
-            // prune labels
             for (String pruneLabel : prunedOrder) {
 
                 // find all the factors that contains the label
@@ -125,14 +140,19 @@ public class BayesianNetwork {
                 Factor f = toSumOut.get(0);
                 if (toSumOut.size() > 1) {
                     for (int i = 1; i < toSumOut.size(); i++) {
-                        Factor tmp = f.join(toSumOut.get(i));
-                        f = tmp.sumOut(getNode(pruneLabel));
+                        f = f.join(toSumOut.get(i));
+                        noOfJoins++;
                     }
-                } else {
-                    f = f.sumOut(getNode(pruneLabel));
                 }
+                f = f.sumOut(getNode(pruneLabel));
+
                 factors.removeAll(toSumOut);
                 factors.add(f);
+                if (verbose){
+                    System.out.println("After pruning ["+ pruneLabel+ "]-->factors:[");
+                    factors.forEach(cpt->System.out.print(cpt.getFactorLabel()+ ","));
+                    System.out.print("]\n");
+                }
             }
 
             // join factors if factors are more than one
@@ -140,6 +160,7 @@ public class BayesianNetwork {
                 Factor f = factors.get(0);
                 for (int i = 1; i < factors.size(); i++) {
                     f = f.join(factors.get(i));
+                    noOfJoins++;
                 }
                 factors = new ArrayList<>(List.of(f));
             }
@@ -149,10 +170,13 @@ public class BayesianNetwork {
             // get probability based on the queried random variable and its value
             Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
             double probability = queryFactor.get(queryMap);
+            if(verbose){
+                System.out.println("Performed "+ noOfJoins + " joins using order");
+            }
 
             return new QueryResult(probability, order.toArray(String[]::new));
         }
-        return new QueryResult(0.0,new String[0]);
+        return new QueryResult(0.0, new String[0]);
     }
 
 
@@ -164,9 +188,8 @@ public class BayesianNetwork {
      * @param queryInfo query information about query value and evidence
      * @return set of target node ancestors as labels
      */
-    private Set<String> pruneOrder(Set<String> order, QueryInfo queryInfo) {
+    private Set<String> labelsToKeep(Set<String> order, QueryInfo queryInfo) {
         Node targetNode = getNode(queryInfo.getLabel());
-        Set<String> pruneOrder = new LinkedHashSet<>(order);
         if (queryInfo.hasEvidence()) {
             //prune order using the target and the evidences, then merge as a union
             // do target first
@@ -174,23 +197,21 @@ public class BayesianNetwork {
             Set<String> nodesToKeep = ancestors.stream().map(Node::getLabel).collect(Collectors.toSet());
             // add pruned nodes for each evidence
             for (QueryInfo evidence : queryInfo.getEvidences()) {
-                Set<String> prunedByEvidence = pruneOrder(new LinkedHashSet<>(order), evidence);
-                nodesToKeep.addAll(prunedByEvidence);
+                Set<String> labelsToKeep = labelsToKeep(new LinkedHashSet<>(order), evidence);
+                nodesToKeep.addAll(labelsToKeep);
                 // include evidence label
                 nodesToKeep.add(evidence.getLabel());
             }
-            // retain only the nodes in the original order that have been pruned by both the target and the evidence
-            pruneOrder.retainAll(nodesToKeep);
             // just incase the target node is included in the order, (if target node is an ancestor of an evidence nose)
             // remove it, so you dont prune it from when doing join marginalization
-            pruneOrder.remove(targetNode.getLabel());
+            nodesToKeep.remove(targetNode.getLabel());
+            return nodesToKeep;
 
         } else {
             // remove labels that are not ancestors of the  node in question
             List<Node> ancestors = Node.getAllAncestors(targetNode);
-            pruneOrder.retainAll(ancestors.stream().map(Node::getLabel).collect(Collectors.toSet()));
+            return ancestors.stream().map(Node::getLabel).collect(Collectors.toSet());
         }
-        return pruneOrder;
     }
 
 

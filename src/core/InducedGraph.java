@@ -41,4 +41,9 @@ public class InducedGraph {
     public InducedGraphNode getInducedGraphNode(String label) {
         return inducedGraphNodes.stream().filter(ign -> ign.getLabel().equalsIgnoreCase(label)).findFirst().orElse(new InducedGraphNode(label));
     }
+
+    public InducedGraph refreshByRemoval(InducedGraphNode graphNode){
+        // remove the node and connect its parents and children
+        return this;
+    }
 }

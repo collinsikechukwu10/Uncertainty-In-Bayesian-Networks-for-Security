@@ -29,11 +29,19 @@ public class A3main {
      * @param args command line string arguments
      */
     public static void main(String[] args) {
+        if(args.length == 1 && args[0].equalsIgnoreCase("evalCNX")){
+            Evaluator evaluator = new Evaluator();
+            evaluator.run();
+            return;
+        }
 
         Scanner sc = new Scanner(System.in);
         InputScannerUtils scannerUtils = new InputScannerUtils(sc);
         // generate bayesian network based on network ID
+        boolean verbose = args.length==3 && args[2].equalsIgnoreCase("verbose");
         BayesianNetwork network = NetworkGenerator.buildNetwork(args[1]);
+        network.setVerbose(verbose);
+        // handle additional parameters
 
         switch (args[0]) {
             case "P1": {

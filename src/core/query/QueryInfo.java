@@ -92,12 +92,23 @@ public class QueryInfo {
     }
 
     /**
-     * Returns the boolean representation of a boolen string
+     * Returns the boolean representation of a boolean string
+     *
      * @param booleanString boolean string
      * @return boolean value
      */
     public static boolean resolveBoolean(String booleanString) {
         return booleanString.equalsIgnoreCase("T");
+    }
+
+    /**
+     * Returns the boolean string representation of a boolean value
+     *
+     * @param booleanValue boolean value
+     * @return boolean string
+     */
+    public static String resolveToBooleanString(boolean booleanValue) {
+        return booleanValue ? "T" : "F";
     }
 
 }
