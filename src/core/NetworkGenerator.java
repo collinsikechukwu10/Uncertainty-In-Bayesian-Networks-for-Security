@@ -40,7 +40,7 @@ public class NetworkGenerator {
         holiday.addCPTValues(0.125, 0.875);
         firewallDeactivation.addCPTValues(1,0,0.03,0.97);
         maliciousWebsite.addCPTValues(0.15,0.85);
-        networkNoise.addCPTValues();
+        networkNoise.addCPTValues(0.9,0.1);
         attack.addCPTValues();
         logging.addCPTValues();
         return network;
