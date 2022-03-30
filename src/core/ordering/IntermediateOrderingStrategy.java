@@ -21,6 +21,13 @@ public abstract class IntermediateOrderingStrategy extends BasicOrderingStrategy
     private InducedGraph inducedGraph;
     private List<Node> nodesList;
 
+    /**
+     * Gets the number of marked neighbours for an induced graph node.
+     * @param graph induced graph node
+     * @param markedList list of marked induced graph nodes as their labels
+     * @param label label to examine
+     * @return number of marked neighbours for the induced graph node
+     */
     public int getNumberOfMarkedNeighbours(InducedGraph graph, Set<String> markedList, String label) {
         // get induced node and count how many neighbours have their label in the marked list
         int count = 0;
@@ -40,15 +47,6 @@ public abstract class IntermediateOrderingStrategy extends BasicOrderingStrategy
      */
     public InducedGraph getInducedGraph() {
         return inducedGraph;
-    }
-
-    /**
-     * Sets the induced graph
-     *
-     * @param inducedGraph induced graph
-     */
-    public void setInducedGraph(InducedGraph inducedGraph) {
-        this.inducedGraph = inducedGraph;
     }
 
     /**

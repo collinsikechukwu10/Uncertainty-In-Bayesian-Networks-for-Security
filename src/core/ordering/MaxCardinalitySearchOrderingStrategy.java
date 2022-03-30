@@ -29,11 +29,9 @@ public class MaxCardinalitySearchOrderingStrategy extends IntermediateOrderingSt
         int maxNoOfNeighbours = Integer.MIN_VALUE;
 
         List<String> tmpLabels = new ArrayList<>(labels);
-        // apply randomness at the point when marked list is empty
         if (markedList.isEmpty()) {
             Collections.shuffle(tmpLabels);
         }
-
         for (String label : tmpLabels) {
             int unmarkedLabelMarkedNeighboursSize = getNumberOfMarkedNeighbours(graph, markedList, label);
             if (unmarkedLabelMarkedNeighboursSize > maxNoOfNeighbours) {

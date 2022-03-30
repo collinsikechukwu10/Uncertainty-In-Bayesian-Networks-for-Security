@@ -16,19 +16,39 @@ public class InducedGraphNode {
     private final Set<InducedGraphNode> neighbours = new LinkedHashSet<>();
     private final String label;
 
-    InducedGraphNode(String label) {
+    /**
+     * Constructor specifying the label
+     *
+     * @param label label for the node
+     */
+    public InducedGraphNode(String label) {
         this.label = label;
     }
 
+    /**
+     * Gets the label of the induced graph node
+     *
+     * @return label
+     */
     public String getLabel() {
         return label;
     }
 
-    void addNeighbour(InducedGraphNode inducedGraphNode) {
+    /**
+     * Adds a neighbor to the induced graph node.
+     *
+     * @param inducedGraphNode neighbour to add
+     */
+    public void addNeighbour(InducedGraphNode inducedGraphNode) {
         this.neighbours.add(inducedGraphNode);
         inducedGraphNode.neighbours.add(this);
     }
 
+    /**
+     * Gets the neighbors of the induced graph node.
+     *
+     * @return neighbors
+     */
     public Set<InducedGraphNode> getNeighbours() {
         return neighbours;
     }

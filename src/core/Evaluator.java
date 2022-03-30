@@ -1,7 +1,6 @@
 package core;
 
-import core.ordering.MaxCardinalitySearchOrderingStrategy;
-import core.ordering.ProvidedOrderingStrategy;
+import core.ordering.*;
 import core.query.QueryInfo;
 import core.query.QueryResult;
 
@@ -23,12 +22,17 @@ public class Evaluator {
     final BayesianNetwork cnxNetwork;
     private static final DecimalFormat dd = new DecimalFormat("#0.00000");
 
-
+    /**
+     * Empty evaluator constructor.
+     */
     public Evaluator() {
         cnxNetwork = NetworkGenerator.buildNetwork("CNX");
         cnxNetwork.setVerbose(true);
     }
 
+    /**
+     * Runs all queries for CNX Network.
+     */
     public void run() {
         System.out.println("[P1]: Print Network");
         cnxNetwork.renderNetwork();
@@ -38,13 +42,15 @@ public class Evaluator {
         System.out.println();
         System.out.println("[P3]: Run a diagnostic and predictive query with evidence");
         performQueryForPredictingAttackWithEvidence();
-        System.out.println("[P4]: Show how order affects the computation of queries.. We use *no of joins*");
+        System.out.println("[P4 and P5]: Show how order affects the computation of queries.. We use *no of joins*");
         getJoinsPerOrdering();
-
 
 
     }
 
+    /**
+     * Performs non-evidence queries for the CNX Network.
+     */
     public void performQueryForPredictingAttackWithoutEvidence() {
         Node attack = cnxNetwork.getNode("Attack");
         QueryInfo queryInfo = new QueryInfo(attack.getLabel(), true);
@@ -63,6 +69,9 @@ public class Evaluator {
         });
     }
 
+    /**
+     * Performs evidence queries for the CNX Network.
+     */
     public void performQueryForPredictingAttackWithEvidence() {
         Node attack = cnxNetwork.getNode("Attack");
         // set ordering
@@ -96,20 +105,36 @@ public class Evaluator {
 
     }
 
-    public void getJoinsPerOrdering(){
+    /**
+     * Counts joins based on the implemented ordering strategies.
+     */
+    public void getJoinsPerOrdering() {
+
+        // perform join analysis for maximum cardinality
+        getJoinsPerOrdering(new MaxCardinalitySearchOrderingStrategy());
+
+        // perform join analysis for greedy search [ADVANCED FUNCTIONALITIES]
+        getJoinsPerOrdering(new GreedyOrderingStrategy());
+
+    }
+
+    /**
+     * Counts joins based on the ordering strategies provided.
+     */
+    public void getJoinsPerOrdering(IntermediateOrderingStrategy intermediateOrderingStrategy) {
         // since we are using max cardinality, do this multiple times since it is initialized at random
         int repeats = 100;
         Node attack = cnxNetwork.getNode("Attack");
-        HashMap<String,Integer> orderToJoinMapping = new HashMap<>();
+        HashMap<String, Integer> orderToJoinMapping = new HashMap<>();
         for (int i = 0; i < repeats; i++) {
-            cnxNetwork.setOrdering(new MaxCardinalitySearchOrderingStrategy());
+            cnxNetwork.setOrdering(intermediateOrderingStrategy);
             QueryInfo predictiveQuery = new QueryInfo(attack.getLabel(), true);
             QueryResult queryResult = cnxNetwork.query(predictiveQuery);
             String key = Arrays.toString(queryResult.getOrder());
             orderToJoinMapping.putIfAbsent(key, queryResult.getNoOfJoins());
         }
-        orderToJoinMapping.forEach((order,noOfJoins)->{
-            System.out.println("Order: ["+ order + "] performed "+ noOfJoins + "joins");
-        });
+        orderToJoinMapping.forEach((order, noOfJoins) -> System.out.println("Order: [" + order + "] performed " + noOfJoins + "joins"));
     }
+
+
 }

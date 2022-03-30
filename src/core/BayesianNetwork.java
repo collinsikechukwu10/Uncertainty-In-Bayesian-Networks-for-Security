@@ -23,16 +23,26 @@ public class BayesianNetwork {
     private boolean verbose;
 
     /**
-     * Bayesian network empty constructor.
+     * Bayesian network constructor specifying verbosity.
+     *
+     * @param verbose verbosity
      */
     public BayesianNetwork(boolean verbose) {
         this.verbose = verbose;
     }
 
+    /**
+     * Bayesian network empty constructor.
+     */
     public BayesianNetwork() {
         this(false);
     }
 
+    /**
+     * Sets verbosity of the bayesian network
+     *
+     * @param verbose verbosity
+     */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
@@ -148,9 +158,9 @@ public class BayesianNetwork {
 
                 factors.removeAll(toSumOut);
                 factors.add(f);
-                if (verbose){
-                    System.out.println("After pruning ["+ pruneLabel+ "]-->factors:[");
-                    factors.forEach(cpt->System.out.print(cpt.getFactorLabel()+ ","));
+                if (verbose) {
+                    System.out.println("After pruning [" + pruneLabel + "]-->factors:[");
+                    factors.forEach(cpt -> System.out.print(cpt.getFactorLabel() + ","));
                     System.out.print("]\n");
                 }
             }
@@ -170,8 +180,8 @@ public class BayesianNetwork {
             // get probability based on the queried random variable and its value
             Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
             double probability = queryFactor.get(queryMap);
-            if(verbose){
-                System.out.println("Performed "+ noOfJoins + " joins using order");
+            if (verbose) {
+                System.out.println("Performed " + noOfJoins + " joins using order");
             }
 
             return new QueryResult(probability, order.toArray(String[]::new));

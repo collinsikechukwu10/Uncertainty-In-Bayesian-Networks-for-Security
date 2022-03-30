@@ -17,27 +17,32 @@ public class NetworkGenerator {
      */
     private static BayesianNetwork createCNXNetwork() {
         BayesianNetwork network = new BayesianNetwork();
-        Node maintenance = network.addNode("Maintenance");
-        Node maintenanceInfo = network.addNode("Maintenance Info");
-        Node firewall = network.addNode("Firewall");
-        Node maliciousWebsite = network.addNode("Malicious Website");
+        Node maintenancePlanned = network.addNode("Maintenance Planned");
+        Node maintenanceInfo = network.addNode("Outdated Maintenance Info");
+        Node firewallDeactivation = network.addNode("Firewall Deactivation");
+        Node maliciousWebsite = network.addNode("BlockedMalicious Website");
         Node holiday = network.addNode("Holiday");
+        Node networkNoise = network.addNode("CNX Network Noise");
         Node attack = network.addNode("Security Attack");
         Node logging = network.addNode("Logging");
-        Node alarmTrigger = network.addNode("Alarm Trigger");
-        network.addEdge(maintenanceInfo, maintenance);
-        network.addEdge(maintenance, firewall);
-        network.addEdge(maintenanceInfo, firewall);
+
+        network.addEdge(maintenanceInfo, maintenancePlanned);
+        network.addEdge(maintenancePlanned, firewallDeactivation);
 
         network.addEdge(holiday, attack);
-        network.addEdge(firewall, attack);
+        network.addEdge(firewallDeactivation, attack);
         network.addEdge(maliciousWebsite, attack);
+        network.addEdge(networkNoise,attack );
 
-        network.addEdge(attack, alarmTrigger);
         network.addEdge(attack, logging);
-        network.addEdge(alarmTrigger, logging);
-
+        maintenancePlanned.addCPTValues(0.95,0.05);
+        maintenanceInfo.addCPTValues(0.95,0.05);
         holiday.addCPTValues(0.125, 0.875);
+        firewallDeactivation.addCPTValues(1,0,0.03,0.97);
+        maliciousWebsite.addCPTValues(0.15,0.85);
+        networkNoise.addCPTValues();
+        attack.addCPTValues();
+        logging.addCPTValues();
         return network;
     }
 

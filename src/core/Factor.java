@@ -164,9 +164,11 @@ public class Factor {
 
     }
 
+    /**
+     * Normalizes the values in the probability table.
+     */
     public void normalize() {
         // we only normalize a prior distribution, where only one r.v. exists
-        // TODO, [FUTURE WORK] implement for multiple r.v.s
         if (randomVariables.size() == 1) {
             double total = cpt.values().stream().reduce(0.0, Double::sum);
             cpt.forEach((key, probability) -> assignProbability(keyToBoolean(key), probability / total));

@@ -24,6 +24,7 @@ public class GreedyOrderingStrategy extends IntermediateOrderingStrategy {
      */
     @Override
     public Set<String> getOrder(QueryInfo queryInfo) {
+        InducedGraph graph = getInducedGraph();
         Node queryNode = getNodesList().stream().filter(n -> n.getLabel().equalsIgnoreCase(queryInfo.getLabel())).findFirst().orElse(null);
         if (queryNode != null) {
             Set<String> unmarkedList = getNodesList().stream().map(Node::getLabel).collect(Collectors.toSet());
@@ -31,11 +32,11 @@ public class GreedyOrderingStrategy extends IntermediateOrderingStrategy {
             List<String> order = new ArrayList<>();
 
             for (int i = 0; i < getNodesList().size(); i++) {
-                String label = getLabelWithMinimumNumberOfMarkedNeighbours(getInducedGraph(), markedList, unmarkedList);
+                String label = getLabelWithMinimumNumberOfMarkedNeighbours(graph, markedList, unmarkedList);
                 order.add(label);
                 unmarkedList.remove(label);
                 markedList.add(label);
-                setInducedGraph(refreshInducedGraph(getInducedGraph()));
+                graph = graph.connectNeighbors(label);
             }
             order.remove(queryNode.getLabel());
             return new LinkedHashSet<>(order);
@@ -54,7 +55,11 @@ public class GreedyOrderingStrategy extends IntermediateOrderingStrategy {
     private String getLabelWithMinimumNumberOfMarkedNeighbours(InducedGraph graph, Set<String> markedList, Set<String> labels) {
         String y = null;
         int maxNoOfNeighbours = Integer.MAX_VALUE;
-        for (String label : labels) {
+        List<String> tmpLabels = new ArrayList<>(labels);
+        if (markedList.isEmpty()) {
+            Collections.shuffle(tmpLabels);
+        }
+        for (String label : tmpLabels) {
             int unmarkedLabelMarkedNeighboursSize = getNumberOfMarkedNeighbours(graph, markedList, label);
             if (unmarkedLabelMarkedNeighboursSize < maxNoOfNeighbours) {
                 maxNoOfNeighbours = unmarkedLabelMarkedNeighboursSize;
@@ -62,10 +67,5 @@ public class GreedyOrderingStrategy extends IntermediateOrderingStrategy {
             }
         }
         return y;
-    }
-
-    // TODO implement this induced graph update
-    private InducedGraph refreshInducedGraph(InducedGraph inducedGraph) {
-        return inducedGraph;
     }
 }
