@@ -30,7 +30,7 @@ public class MaxCardinalitySearchOrderingStrategy extends IntermediateOrderingSt
 
         List<String> tmpLabels = new ArrayList<>(labels);
         if (markedList.isEmpty()) {
-            Collections.shuffle(tmpLabels);
+            Collections.shuffle(tmpLabels, getRandom());
         }
         for (String label : tmpLabels) {
             int unmarkedLabelMarkedNeighboursSize = getNumberOfMarkedNeighbours(graph, markedList, label);

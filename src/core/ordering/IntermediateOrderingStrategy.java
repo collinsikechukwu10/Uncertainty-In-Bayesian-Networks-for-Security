@@ -6,6 +6,7 @@ import core.Node;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -20,6 +21,7 @@ public abstract class IntermediateOrderingStrategy extends BasicOrderingStrategy
 
     private InducedGraph inducedGraph;
     private List<Node> nodesList;
+    public Random random = new Random(123);
 
     /**
      * Gets the number of marked neighbours for an induced graph node.
@@ -66,5 +68,9 @@ public abstract class IntermediateOrderingStrategy extends BasicOrderingStrategy
     public void setNodesList(List<Node> nodesList) {
         this.nodesList = nodesList;
         this.inducedGraph = new InducedGraph(new HashSet<>(nodesList));
+    }
+
+    public Random getRandom() {
+        return random;
     }
 }

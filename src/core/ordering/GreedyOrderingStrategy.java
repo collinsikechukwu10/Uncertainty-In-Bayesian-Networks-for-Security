@@ -57,7 +57,7 @@ public class GreedyOrderingStrategy extends IntermediateOrderingStrategy {
         int maxNoOfNeighbours = Integer.MAX_VALUE;
         List<String> tmpLabels = new ArrayList<>(labels);
         if (markedList.isEmpty()) {
-            Collections.shuffle(tmpLabels);
+            Collections.shuffle(tmpLabels,getRandom());
         }
         for (String label : tmpLabels) {
             int unmarkedLabelMarkedNeighboursSize = getNumberOfMarkedNeighbours(graph, markedList, label);
