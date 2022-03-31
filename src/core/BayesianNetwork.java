@@ -133,6 +133,7 @@ public class BayesianNetwork {
             // lets track the number of joins
             int noOfJoins = 0;
             Map<String, String> prunedFactorTracker = new LinkedHashMap<>();
+            List<Integer> complexities = new ArrayList<>();
 
             // add evidence to prunable order because previous function does not include it
             labelsToKeep.add(queryNode.getLabel());
@@ -164,6 +165,8 @@ public class BayesianNetwork {
                         noOfJoins++;
                     }
                 }
+                // get complexity
+                complexities.add(f.getOrderedVariables().size());
                 f = f.sumOut(getNode(pruneLabel));
 
                 factors.removeAll(toSumOut);
@@ -190,8 +193,8 @@ public class BayesianNetwork {
             // get probability based on the queried random variable and its value
             Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
             double probability = queryFactor.get(queryMap);
-
-            return new QueryResult(probability, order.toArray(String[]::new), noOfJoins, prunedFactorTracker);
+            double complexity = complexities.stream().map(x->Math.pow(2,x)).reduce(0.0,Double::sum);
+            return new QueryResult(probability, order.toArray(String[]::new), noOfJoins, prunedFactorTracker, complexity);
         }
         return new QueryResult(0.0, new String[0]);
     }

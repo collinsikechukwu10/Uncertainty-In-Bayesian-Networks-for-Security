@@ -16,6 +16,7 @@ public class QueryResult {
     private final String[] order;
     private final int noOfJoins;
     private final Map<String, String> pruningHistory;
+    private final double complexity;
 
     /**
      * Constructor specifying the probability and the query order
@@ -39,7 +40,6 @@ public class QueryResult {
         this(probability, order, noOfJoins, new HashMap<>());
 
     }
-
     /**
      * Constructor specifying the probability and the query order and number of joins.
      *
@@ -49,10 +49,26 @@ public class QueryResult {
      * @param pruningHistory pruning history
      */
     public QueryResult(double probability, String[] order, int noOfJoins, Map<String, String> pruningHistory) {
+        this(probability, order, noOfJoins,pruningHistory,-1);
+
+
+    }
+
+    /**
+     * Constructor specifying the probability and the query order and number of joins.
+     *
+     * @param probability    query r.v probability
+     * @param order          query order
+     * @param noOfJoins      number of joins
+     * @param pruningHistory pruning history
+     * @param complexity     query complexity
+     */
+    public QueryResult(double probability, String[] order, int noOfJoins, Map<String, String> pruningHistory, double complexity) {
         this.probability = probability;
         this.order = order;
         this.noOfJoins = noOfJoins;
         this.pruningHistory = pruningHistory;
+        this.complexity = complexity;
 
     }
 
@@ -90,5 +106,9 @@ public class QueryResult {
      */
     public int getNoOfJoins() {
         return noOfJoins;
+    }
+
+    public double getComplexity() {
+        return complexity;
     }
 }

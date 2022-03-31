@@ -158,21 +158,22 @@ public class Evaluator {
         // since we are using max cardinality, do this multiple times since it is initialized at random
         int repeats = 100;
         Node attack = cnxNetwork.getNode("Security Attack");
-        Map<String, Map<String,String>> orderToJoinMapping = new HashMap<>();
+        Map<String, QueryResult> orderToJoinMapping = new HashMap<>();
         for (int i = 0; i < repeats; i++) {
             cnxNetwork.setOrdering(intermediateOrderingStrategy);
             QueryInfo predictiveQuery = new QueryInfo(attack.getLabel(), true);
             QueryResult queryResult = cnxNetwork.query(predictiveQuery);
             String key = Arrays.toString(queryResult.getOrder());
-            orderToJoinMapping.putIfAbsent(key, queryResult.getPruningHistory());
+            orderToJoinMapping.putIfAbsent(key, queryResult);
         }
 
-        orderToJoinMapping.forEach((order, pruneHistory) -> {
+        orderToJoinMapping.forEach((order, qr) -> {
             System.out.println("Order:" + order);
             System.out.println("-----------------------------------------");
-            pruneHistory.forEach((pruneLabel, pruneFactors)->{
+            qr.getPruningHistory().forEach((pruneLabel, pruneFactors)->{
                 System.out.println("After pruning [" + pruneLabel + "]-->factors:[" + pruneFactors + "]");
             });
+            System.out.println("Complexity: "+ qr.getComplexity());
             System.out.println("-----------------------------------------");
 
         });
