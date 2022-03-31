@@ -18,31 +18,28 @@ public class NetworkGenerator {
     private static BayesianNetwork createCNXNetwork() {
         BayesianNetwork network = new BayesianNetwork();
         Node maintenancePlanned = network.addNode("Maintenance Planned");
-        Node maintenanceInfo = network.addNode("Outdated Maintenance Info");
+        Node outdatedMaintenanceInfo = network.addNode("Outdated Maintenance Info");
         Node firewallDeactivation = network.addNode("Firewall Deactivation");
-        Node maliciousWebsite = network.addNode("BlockedMalicious Website");
+        Node blockedMaliciousWebsite = network.addNode("Blocked Malicious Website");
         Node holiday = network.addNode("Holiday");
-        Node networkNoise = network.addNode("CNX Network Noise");
-        Node attack = network.addNode("Security Attack");
-        Node logging = network.addNode("Logging");
+        Node networkAttack = network.addNode("Security Attack");
+        Node loggingSystemClassification = network.addNode("Logging System Classification");
 
-        network.addEdge(maintenanceInfo, maintenancePlanned);
+        network.addEdge(maintenancePlanned, outdatedMaintenanceInfo);
         network.addEdge(maintenancePlanned, firewallDeactivation);
+        network.addEdge(outdatedMaintenanceInfo, firewallDeactivation);
+        network.addEdge(holiday, networkAttack);
+        network.addEdge(firewallDeactivation, networkAttack);
+        network.addEdge(blockedMaliciousWebsite, networkAttack);
+        network.addEdge(networkAttack, loggingSystemClassification);
 
-        network.addEdge(holiday, attack);
-        network.addEdge(firewallDeactivation, attack);
-        network.addEdge(maliciousWebsite, attack);
-        network.addEdge(networkNoise,attack );
-
-        network.addEdge(attack, logging);
-        maintenancePlanned.addCPTValues(0.95,0.05);
-        maintenanceInfo.addCPTValues(0.95,0.05);
-        holiday.addCPTValues(0.125, 0.875);
-        firewallDeactivation.addCPTValues(1,0,0.03,0.97);
-        maliciousWebsite.addCPTValues(0.15,0.85);
-        networkNoise.addCPTValues(0.9,0.1);
-        attack.addCPTValues();
-        logging.addCPTValues();
+        maintenancePlanned.addCPTValues((double) 29 / 30, (double) 1 / 30);
+        outdatedMaintenanceInfo.addCPTValues(1, 0, 0.98, 0.02);
+        firewallDeactivation.addCPTValues(1, 0, 1, 0, 0.97, 0.03, 0.95, 0.05);
+        holiday.addCPTValues(0.875, 0.125);
+        blockedMaliciousWebsite.addCPTValues(0.15, 0.85);
+        loggingSystemClassification.addCPTValues(0.7, 0.3, 0.3, 0.7);
+        networkAttack.addCPTValues(0.05,0.95,0.35,0.65,0.35,0.65,0.28,0.72,0.05,0.95,0.22,0.78,0.22,0.78,0.136,0.864);
         return network;
     }
 
