@@ -24,6 +24,8 @@ public class NetworkGenerator {
         Node holiday = network.addNode("Holiday");
         Node networkAttack = network.addNode("Security Attack");
         Node loggingSystemClassification = network.addNode("Logging System Classification");
+        Node cnxNetworkNoise = network.addNode("CNX Network Node");
+        Node alertTriggered = network.addNode("Alert Triggered");
 
         network.addEdge(maintenancePlanned, outdatedMaintenanceInfo);
         network.addEdge(maintenancePlanned, firewallDeactivation);
@@ -32,14 +34,17 @@ public class NetworkGenerator {
         network.addEdge(firewallDeactivation, networkAttack);
         network.addEdge(blockedMaliciousWebsite, networkAttack);
         network.addEdge(networkAttack, loggingSystemClassification);
-
+        network.addEdge(cnxNetworkNoise, alertTriggered);
+        network.addEdge(networkAttack, alertTriggered);
         maintenancePlanned.addCPTValues((double) 29 / 30, (double) 1 / 30);
         outdatedMaintenanceInfo.addCPTValues(1, 0, 0.98, 0.02);
         firewallDeactivation.addCPTValues(1, 0, 1, 0, 0.97, 0.03, 0.95, 0.05);
         holiday.addCPTValues(0.875, 0.125);
         blockedMaliciousWebsite.addCPTValues(0.15, 0.85);
         loggingSystemClassification.addCPTValues(0.7, 0.3, 0.3, 0.7);
-        networkAttack.addCPTValues(0.05,0.95,0.35,0.65,0.35,0.65,0.28,0.72,0.05,0.95,0.22,0.78,0.22,0.78,0.136,0.864);
+        networkAttack.addCPTValues(0.99,0.01,0.66,0.34,0.6,0.4,0.48,0.52,0.98,0.2,0.51,0.49,0.45,0.55,0.33,0.67);
+        cnxNetworkNoise.addCPTValues(0.915,0.085);
+        alertTriggered.addCPTValues(1,0,0.95,0.05,1,0,0.05,0.95);
         return network;
     }
 

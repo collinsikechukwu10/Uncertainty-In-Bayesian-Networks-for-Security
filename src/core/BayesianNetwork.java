@@ -48,6 +48,15 @@ public class BayesianNetwork {
     }
 
     /**
+     * Gets nodes of the bayesian network.
+     *
+     * @return nodes
+     */
+    public Set<Node> getNodes() {
+        return nodes;
+    }
+
+    /**
      * Adds a node to the bayesian network
      *
      * @param label node label
@@ -123,6 +132,7 @@ public class BayesianNetwork {
             prunedOrder.retainAll(labelsToKeep);
             // lets track the number of joins
             int noOfJoins = 0;
+            Map<String, String> prunedFactorTracker = new LinkedHashMap<>();
 
             // add evidence to prunable order because previous function does not include it
             labelsToKeep.add(queryNode.getLabel());
@@ -158,10 +168,10 @@ public class BayesianNetwork {
 
                 factors.removeAll(toSumOut);
                 factors.add(f);
+                String prunedFactor = factors.stream().map(Factor::getFactorLabel).collect(Collectors.joining(", "));
+                prunedFactorTracker.put(pruneLabel, prunedFactor);
                 if (verbose) {
-                    System.out.println("After pruning [" + pruneLabel + "]-->factors:[");
-                    factors.forEach(cpt -> System.out.print(cpt.getFactorLabel() + ","));
-                    System.out.print("]\n");
+                    System.out.println("After pruning [" + pruneLabel + "]-->factors:[" + prunedFactor + "]");
                 }
             }
 
@@ -180,11 +190,8 @@ public class BayesianNetwork {
             // get probability based on the queried random variable and its value
             Map<String, Boolean> queryMap = queryFactor.generateQueryMap(new boolean[]{queryInfo.getQueryValue()});
             double probability = queryFactor.get(queryMap);
-            if (verbose) {
-                System.out.println("Performed " + noOfJoins + " joins using order");
-            }
 
-            return new QueryResult(probability, order.toArray(String[]::new));
+            return new QueryResult(probability, order.toArray(String[]::new), noOfJoins, prunedFactorTracker);
         }
         return new QueryResult(0.0, new String[0]);
     }
