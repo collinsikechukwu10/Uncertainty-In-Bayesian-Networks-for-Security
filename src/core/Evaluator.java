@@ -178,13 +178,23 @@ public class Evaluator {
         });
     }
 
+    /**
+     * Get the CNX network random variables used in the network.
+     * @return network random variables
+     */
     private List<String> cnXNetworkRandomVariableLabels() {
         return cnxNetwork.getNodes().stream().map(Node::getLabel).collect(Collectors.toList());
     }
 
-    private List<String> createOrderList(String label) {
+    /**
+     * Returns the order of the CNX network nodes based its insertion into the network.
+     * The target label is removed from this list.
+     * @param targetLabel target label
+     * @return order
+     */
+    private List<String> createOrderList(String targetLabel) {
         List<String> order = cnXNetworkRandomVariableLabels();
-        order.remove(label);
+        order.remove(targetLabel);
 
         return order;
     }
