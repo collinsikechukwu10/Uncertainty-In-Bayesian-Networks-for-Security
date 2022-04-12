@@ -2,10 +2,6 @@
 
 
 ### Implementation Checklist
-- [x] Bayesian Network
-- [x] Query (Without evidence)
-- [x] Query (With evidence)
-
 - [x] CNX, BNA, BNB, and BNC Bayesian networks were implemented (in the Network Folder). 
 - [x] P1: Implemented printing of Bayesian networks to confirm accurate input of probability values.
 - [x] P2: The Bayesian network inference using the variable elimination algorithm
